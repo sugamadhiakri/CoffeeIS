@@ -5,6 +5,23 @@
  */
 package com.sugamadhiakri.CoffeeIS;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+
 /**
  *
  * @author sugam
@@ -28,60 +45,96 @@ public class NewJFrame extends javax.swing.JFrame {
     private void initComponents() {
 
         jScrollPane2 = new javax.swing.JScrollPane();
-        jTable2 = new javax.swing.JTable();
+        contentTable = new javax.swing.JTable();
         jPanel2 = new javax.swing.JPanel();
-        jButton1 = new javax.swing.JButton();
-        jTextField1 = new javax.swing.JTextField();
-        jButton2 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
-        jButton4 = new javax.swing.JButton();
-        jComboBox1 = new javax.swing.JComboBox<>();
+        addItemButton = new javax.swing.JButton();
+        searchByPriceField = new javax.swing.JTextField();
+        searchButton = new javax.swing.JButton();
+        importButton = new javax.swing.JButton();
+        exportButton = new javax.swing.JButton();
+        sortByComboBox = new javax.swing.JComboBox<>();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
-        jMenu2 = new javax.swing.JMenu();
         jMenu4 = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Coffie Inventory System");
 
-        jTable2.setModel(new javax.swing.table.DefaultTableModel(
+        DefaultTableModel model = new javax.swing.table.DefaultTableModel();
+        String[] columns = {
+            "CoffeeID", "Customer", "Category", "Price", "Order"
+        };
+        contentTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
             },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+            columns
+        ) {
+            Class[] types = new Class [] {
+                java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.Double.class, java.lang.String.class
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
             }
-        ));
-        jTable2.setName(""); // NOI18N
-        jScrollPane2.setViewportView(jTable2);
+        });
+        System.out.println(System.getProperty("user.dir")+"\\import.csv");
+        openFile(System.getProperty("user.dir") + "\\import.csv");
+        contentTable.setName(""); // NOI18N
+        jScrollPane2.setViewportView(contentTable);
 
-        jPanel2.setBackground(new java.awt.Color(255, 255, 255));
-
-        jButton1.setText("Add Item");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        addItemButton.setText("Add Item");
+        addItemButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                addItemButtonActionPerformed(evt);
             }
         });
 
-        jTextField1.setBorder(javax.swing.BorderFactory.createTitledBorder("Search by Price"));
-
-        jButton2.setText("Search");
-
-        jButton3.setText("Import");
-
-        jButton4.setText("Export");
-        jButton4.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton4ActionPerformed(evt);
+        searchByPriceField.setBackground(new java.awt.Color(215, 215, 215));
+        searchByPriceField.setBorder(javax.swing.BorderFactory.createTitledBorder("Search by Price"));
+        searchByPriceField.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                searchByPriceFieldKeyPressed(evt);
             }
         });
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        jComboBox1.setBorder(javax.swing.BorderFactory.createTitledBorder("Sort By"));
+        searchButton.setText("Search");
+        searchButton.setFocusable(false);
+        searchButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        searchButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        searchButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                searchButtonActionPerformed(evt);
+            }
+        });
+
+        importButton.setText("Import");
+        importButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                importButtonActionPerformed(evt);
+            }
+        });
+
+        exportButton.setText("Export");
+        exportButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                exportButtonActionPerformed(evt);
+            }
+        });
+
+        sortByComboBox.setBackground(new java.awt.Color(215, 215, 215));
+        sortByComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "CoffeeID", "Customer", "Price" }));
+        sortByComboBox.setBorder(javax.swing.BorderFactory.createTitledBorder("Sort By"));
+        sortByComboBox.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        sortByComboBox.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                sortByComboBoxItemStateChanged(evt);
+            }
+        });
+        sortByComboBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                sortByComboBoxActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -90,46 +143,45 @@ public class NewJFrame extends javax.swing.JFrame {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addGap(20, 20, 20)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(addItemButton, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 186, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(searchByPriceField, javax.swing.GroupLayout.PREFERRED_SIZE, 186, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
-                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(searchButton, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 83, Short.MAX_VALUE)
-                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 182, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(sortByComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 182, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jButton3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jButton4, javax.swing.GroupLayout.DEFAULT_SIZE, 107, Short.MAX_VALUE))
+                    .addComponent(importButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(exportButton, javax.swing.GroupLayout.DEFAULT_SIZE, 107, Short.MAX_VALUE))
                 .addGap(35, 35, 35))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addContainerGap(26, Short.MAX_VALUE)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(20, Short.MAX_VALUE)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(searchByPriceField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(jPanel2Layout.createSequentialGroup()
+                            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                                    .addComponent(importButton, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGap(32, 32, 32))
+                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                                    .addComponent(sortByComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGap(28, 28, 28)))
+                            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(addItemButton, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(exportButton, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))))
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                                .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(32, 32, 32))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(28, 28, 28)))
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addComponent(searchButton, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(80, 80, 80)))
                 .addContainerGap())
         );
 
         jMenu1.setText("File");
         jMenuBar1.add(jMenu1);
-
-        jMenu2.setText("Edit");
-        jMenuBar1.add(jMenu2);
 
         jMenu4.setText("Help");
         jMenuBar1.add(jMenu4);
@@ -154,13 +206,154 @@ public class NewJFrame extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void addItemButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addItemButtonActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jButton1ActionPerformed
+        AddItem addFrame = new AddItem();
+        addFrame.setVisible(true);
+    }//GEN-LAST:event_addItemButtonActionPerformed
 
-    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+    private void exportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportButtonActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jButton4ActionPerformed
+        JFileChooser fc = new JFileChooser(System.getProperty("user.dir"));
+        fc.setDialogTitle("Export");
+        fc.setDialogType(JFileChooser.SAVE_DIALOG);
+        int i = fc.showDialog(this, "Export");
+        
+        if(i == JFileChooser.APPROVE_OPTION){
+            File toSave = fc.getSelectedFile();
+            try {
+                saveFile(toSave);
+            } catch (IOException ex) {
+                Logger.getLogger(NewJFrame.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }//GEN-LAST:event_exportButtonActionPerformed
+
+    private void sortByComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sortByComboBoxActionPerformed
+        // TODO add your handling code here:
+        if (evt.getActionCommand().equals("comboBoxChanged")) {
+            sortBy(sortByComboBox.getSelectedItem().toString());
+        }
+    }//GEN-LAST:event_sortByComboBoxActionPerformed
+
+    private void sortByComboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_sortByComboBoxItemStateChanged
+        // TODO add your handling code here:
+
+    }//GEN-LAST:event_sortByComboBoxItemStateChanged
+
+    private void importButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_importButtonActionPerformed
+        // TODO add your handling code here:
+        JFileChooser fc = new JFileChooser(System.getProperty("user.dir"));
+        fc.setDialogTitle("Import");
+        int i = fc.showOpenDialog(this);
+        if (i == JFileChooser.APPROVE_OPTION) {
+            File f = fc.getSelectedFile();
+            String filepath = f.getPath();
+            if (openFile(filepath)) {
+                JOptionPane.showMessageDialog(null, f.getName() + " is Imported");
+            } else {
+                JOptionPane.showMessageDialog(null, f.getName() + " was not Imported");
+            }
+        }
+    }//GEN-LAST:event_importButtonActionPerformed
+
+    private void searchByPriceFieldKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_searchByPriceFieldKeyPressed
+        // TODO add your handling code here:
+        boolean valid = evt.getKeyChar() >= '0' && evt.getKeyChar() <= '9' || evt.getKeyCode() == 8 || evt.getKeyChar() == '.';
+        
+        // check for double decimal points
+        if(evt.getKeyChar() == '.'){
+            for(char i: searchByPriceField.getText().toCharArray()){
+                if(i == '.'){
+                    valid = false;
+                    
+                }
+            }
+        }
+        if(valid)    
+            searchByPriceField.setEditable(true);
+        else
+            searchByPriceField.setEditable(false);
+    }//GEN-LAST:event_searchByPriceFieldKeyPressed
+
+    private void searchButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchButtonActionPerformed
+        // TODO add your handling code here:
+        if(!searchByPriceField.getText().isEmpty()){
+            
+        } else {
+            JOptionPane.showMessageDialog(this, "Please enter the price");
+        }
+    }//GEN-LAST:event_searchButtonActionPerformed
+
+    private boolean openFile(String filePath) {
+        ArrayList<Object[]> rows = new ArrayList<>();
+        boolean success = false;
+        BufferedReader br = null;
+        String line = "";
+        
+        try {
+            br = new BufferedReader(new FileReader(filePath));
+
+            while ((line = br.readLine()) != null) {
+
+                String[] row = line.split(",");
+                int coffeeID = Integer.parseInt(row[0]);
+                String customer = row[1];
+                String category = row[2];
+                double price = Double.parseDouble(row[3]);
+                String order = row[4];
+
+                Object[] rowData = {coffeeID, customer, category, price, order};
+                rows.add(rowData);
+
+                System.out.println(coffeeID + "\t" + customer + "\t" + category + "\t" + price + "\t" + order);
+            }
+            DefaultTableModel model = (DefaultTableModel) contentTable.getModel();
+            model.setRowCount(0);
+            
+            for(Object[] row: rows){
+                model.addRow(row);
+            }
+            
+            success = true;
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error while parsing the data, please refer to help section on what type of csv files you can import", "Failure", JOptionPane.ERROR_MESSAGE);
+            success = false;
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            return success;
+        }
+    }
+    
+    private void saveFile(File file) throws IOException{
+        Path path = file.toPath();
+        BufferedWriter bw = null;
+        try {
+            bw = Files.newBufferedWriter(path,
+                    StandardCharsets.UTF_8, StandardOpenOption.CREATE);
+            
+            DefaultTableModel model = (DefaultTableModel) contentTable.getModel();
+            String rows = "";
+            for(int i = 0; i < model.getRowCount(); i++){
+                for(int j = 0; j < model.getColumnCount(); j++){
+                    rows += model.getValueAt(i, j) + ",";
+                }
+                rows += "\n";
+            }
+            bw.write(rows);
+            
+        } catch (IOException e){
+            System.out.println(e.getStackTrace());
+        } finally{
+            bw.flush();
+        }
+    }
 
     /**
      * @param args the command line arguments
@@ -197,19 +390,42 @@ public class NewJFrame extends javax.swing.JFrame {
         });
     }
 
+    /**
+     *
+     * @param coffeeID
+     * @param customer
+     * @param price
+     */
+    static void addItem(int coffeeID, String customer, String category, double price, String order) {
+        System.out.println("coffee ID: " + coffeeID);
+        System.out.println("customer: " + customer);
+        System.out.println("Category: " + category);
+        System.out.println("price: " + price);
+        System.out.println("order: " + order);
+        
+        Object[] row = {coffeeID, customer, category, price, order};
+        DefaultTableModel model = (DefaultTableModel) contentTable.getModel();
+        model.addRow(row);
+        System.out.println("Row Added!");
+    }
+
+    private static void sortBy(String col) {
+        System.out.println("Sorting by: " + col);
+    }
+
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
-    private javax.swing.JComboBox<String> jComboBox1;
+    private javax.swing.JButton addItemButton;
+    static javax.swing.JTable contentTable;
+    private javax.swing.JButton exportButton;
+    private javax.swing.JButton importButton;
     private javax.swing.JMenu jMenu1;
-    private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu4;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTable jTable2;
-    private javax.swing.JTextField jTextField1;
+    private javax.swing.JButton searchButton;
+    private javax.swing.JTextField searchByPriceField;
+    private javax.swing.JComboBox<String> sortByComboBox;
     // End of variables declaration//GEN-END:variables
 }
